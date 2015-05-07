@@ -23,6 +23,9 @@ public interface BTree {
 	 */
 	boolean contains(Comparable comp);
 	
+        
+	boolean delete(Comparable comp);
+        
 	/**
 	 * @return Returns the amount of objects contained by the tree.
 	 */

@@ -120,13 +120,19 @@ public class BTreeClass implements BTree {
         return true; //Finish
     }
 
+
+    /**
+     * Delete an element of the tree
+     * @param comp Comparable object
+     * @return true/false
+     */
+    @Override
     public boolean delete(Comparable comp) {
         if (!contains(comp)) {
             return false;
         }
 
-        println("Delete: " + comp);
-
+//        println("Delete: " + comp);
         if (!isEmpty()) {
             delete(root, comp);
             return true;
@@ -146,57 +152,38 @@ public class BTreeClass implements BTree {
                     node.contents[i - 1] = node.contents[i];
                 }
             }
-            if (found) // delete last double key
+            if (found) // reset last double key
             {
                 node.contents[nodeSize] = null;
             }
-        } else if (node.hasKey(key)) { // Key found in internal node 
-            println("Internal");
-            int cIndex = node.getIndexOfKey(key);
-            BTreeNode left = node.getSubtree(cIndex);
-            BTreeNode right = node.getSubtree(cIndex + 1);
-//            println(left.countKeys());
-            if (left.countKeys() > order) // Use the next smaller Number from the left tree
-            {
-                BTreeNode prev = left;
-                BTreeNode delete = left;
 
-                while (prev.hasSubtrees()) // Get the next smaller number
-                {
-                    delete = prev;
-                    prev = prev.subTrees[prev.countKeys()];
-                }
-
-                Comparable newKey = prev.contents[prev.countKeys() - 1]; // Set found number as new key
-                node.contents[cIndex] = newKey;
-                delete(delete, newKey);
-            } else if (right.countKeys() > order) { // use the next bigger number from the right tree
-                BTreeNode next = right;
-                BTreeNode delete = right;
-
-                while (next.hasSubtrees()) // Get the next bigger number
-                {
-                    delete = next;
-                    next = next.subTrees[0];
-                }
-
-                Comparable newKey = next.contents[0]; // Set found number as new key
-                node.contents[cIndex] = newKey;
-                delete(delete, newKey);
-            } else { // left and right nodes are to small to get key, merge them
-                mergeNodes(left, right);
-//                left.contents[mIndex] = node.contents[cIndex];
-//                println(cIndex);
-                cIndex++;
-
-                for (int i = cIndex; i < node.countKeys(); i++) {
-                    node.contents[i - 1] = node.contents[i];
-                    node.subTrees[i] = node.subTrees[i + 1];
-                }
-                node.contents[node.countKeys() - 1] = null;
-                node.subTrees[node.countKeys() + 1] = null;
+            if (node.countKeys() < order) { // underflow -> Check merging
+//                print("Leaf deleted: "); printHierarchy();
+                mergeCheck(root);
             }
-        } else { // Key not found in this node
+        } else if (node.hasKey(key)) { // Key is an internal node
+//            println("Internal");
+            int cIndex = node.getIndexOfKey(key);
+
+            BTreeNode left = node.getSubtree(cIndex);
+            BTreeNode prev = left;
+            BTreeNode delete = left;
+
+            while (prev.hasSubtrees()) // Get the next smaller number
+            {
+                delete = prev;
+                prev = prev.subTrees[prev.countKeys()];
+            }
+
+            Comparable newKey = prev.contents[prev.countKeys() - 1]; // Set found number as new key
+            node.contents[cIndex] = newKey;
+            delete(delete, newKey);
+
+            if (node.countKeys() < order) { // underflow -> Check merging
+//                print("Internal deleted: "); printHierarchy();
+                mergeCheck(root);
+            }
+        } else {// Key not found in this node
 //            println("No");
             int cIndex = 0;
 
@@ -206,89 +193,91 @@ public class BTreeClass implements BTree {
             }
 
             BTreeNode subtree = node.getSubtree(cIndex);
-
-            if (subtree.countKeys() == order) {
-                BTreeNode left = null;
-                BTreeNode right = null;
-
-                if (cIndex > 0) {
-                    left = node.subTrees[cIndex - 1];
-                }
-                if (cIndex < node.countKeys()) {
-                    right = node.subTrees[cIndex + 1];
-                }
-
-                if (left != null && left.countKeys() > order) { // set the cIndex to the next smaller number from left subtree
-//                    println("in left");
-                    left.contents[left.countKeys()] = node.contents[cIndex - 1];
-//                    println("countKeys "+node.countKeys());
-
-                    // shift to the left
-                    for (int i = cIndex; i < node.countKeys(); i++) {
-                        node.contents[i - 1] = node.contents[i];
-                        node.subTrees[i - 1] = node.subTrees[i];
-                    }
-                    node.contents[node.countKeys() - 1] = null;
-                    node.subTrees[node.countKeys() + 1] = null;
-
-                } else if (right != null && right.countKeys() > order) { // set the cIndex to the next bigger number from left subtree
-//                    println("in right");
-                    right.shiftContents(0);
-                    right.shiftTrees(0);
-                    right.contents[0] = node.contents[cIndex];
-
-                    // shift to the right
-                    for (int i = cIndex; i < node.countKeys(); i++) {
-                        node.contents[i] = node.contents[i + 1];
-                        node.subTrees[i] = node.subTrees[i + 1];
-                    }
-                    node.contents[node.countKeys()] = null;
-                    node.subTrees[node.countKeys() + 1] = null;
-                } else if (left != null) { // Merge in the right tree
-//                    println("merged left");
-                    int middle = mergeNodes(subtree, left);
-                    subtree.shiftContents(middle);
-                    subtree.shiftTrees(middle);
-                    subtree.contents[middle] = node.contents[cIndex - 1];
-
-//                    println("mitte: " + middle);
-//                    println("cIndex: " + cIndex);
-                    // shift to the left
-                    for (int i = cIndex; i < node.countKeys(); i++) {
-                        node.contents[i - 1] = node.contents[i];
-                        node.subTrees[i - 1] = node.subTrees[i];
-                    }
-                    node.contents[node.countKeys() - 1] = null;
-                    node.subTrees[node.countKeys()] = null;
-
-                } else if (right != null) { // merge in the left tree
-//                    println("merged right");
-                    int middle = mergeNodes(subtree, right);
-//                    println("mitte: " + middle);
-//                    printHierarchy();
-                    subtree.shiftContents(middle);
-                    subtree.shiftTrees(middle);
-                    subtree.contents[middle] = node.contents[cIndex];
-//                    printHierarchy();
-
-                    // shift to the right
-                    for (int i = cIndex + 1; i < node.countKeys(); i++) {
-                        node.contents[i - 1] = node.contents[i];
-                        node.subTrees[i] = node.subTrees[i + 1];
-                    }
-                    node.contents[node.countKeys() - 1] = null;
-                    node.subTrees[node.countKeys()] = null;
-                    printHierarchy();
-                }
-
-            }
-
             delete(subtree, key);
         }
     }
 
     /**
+     * Check node if there is an underflow and merge it
+     * @param node to check
+     */
+    private void mergeCheck(BTreeNode node) {
+//        println("check");
+        for (int i = 0; i < node.subTrees.length; i++) {
+            if (node.subTrees[i] != null) {
+                BTreeNode left = node.subTrees[i] != null ? node.subTrees[i] : null;
+                BTreeNode right = node.subTrees[i + 1] != null ? node.subTrees[i + 1] : null;
+
+                if (left != null && left.countKeys() < order) {// Compare left with right (Possible if item deleted in 0-order*2-1)
+//                    println("Left node to small");
+                    if (right.countKeys() > order) {// right node has more nodes than order size -> compensation
+//                        println("compensation");
+                        left.contents[left.countKeys()] = node.contents[i];
+                        node.contents[i] = right.contents[0];
+
+                        for (int x = 0; x < right.countKeys(); x++) {
+                            right.contents[x] = right.contents[x + 1];
+                            right.subTrees[x] = right.subTrees[x + 1];
+                        }
+//                        print("compensated: "); printHierarchy();
+                    } else { // right node has not enough nodes -> merge
+//                        println("merge");
+                        left.contents[left.countKeys()] = node.contents[i];
+                        mergeNodes(left, right);
+//                        print("not fully merged: "); printHierarchy();
+
+                        for (int x = i + 1; x < node.contents.length; x++) {
+//                            println(x);
+                            node.contents[x - 1] = node.contents[x];
+                            node.subTrees[x] = node.subTrees[x + 1];
+                        }
+//                        print("merged: "); printHierarchy();
+                    }
+                    mergeCheck(root);
+                    return;
+                } else if (right != null && right.countKeys() < order) { // Compare right with left (Possible if item deleted in the last node)
+
+//                    println("Right node to small");
+                    if (left.countKeys() > order) {// left node has more nodes than order size -> compensation
+//                        println("compensation");
+                        for (int x = 0; x < right.countKeys(); x++) {
+                            right.contents[x] = right.contents[x + 1];
+                            right.subTrees[x] = right.subTrees[x + 1];
+                        }
+                        right.contents[0] = node.contents[i];
+                        node.contents[i] = left.contents[left.countKeys() - 1];
+                        left.contents[left.countKeys() - 1] = null;
+//                        print("compensated: "); printHierarchy();
+
+                    } else { // left node has not enough nodes -> merge
+//                        println("merge");
+                        left.contents[left.countKeys()] = node.contents[i];
+                        mergeNodes(left, right);
+                        for (int x = i + 1; x < node.contents.length; x++) {
+//                            println(x);
+                            node.contents[x - 1] = node.contents[x];
+                            node.subTrees[x] = node.subTrees[x + 1];
+                        }
+//                        print("merged: "); printHierarchy();
+                    }
+                    mergeCheck(root);
+                    return;
+                } else if (i == 0 && left != null && right == null) { // Only first node full -> left node up
+                    println("up");
+                    node.contents = left.contents;
+                    node.subTrees = left.subTrees;
+                    mergeCheck(root);
+                    return;
+                } else if (left != null) {
+                    mergeCheck(left);
+                }
+            }
+        }
+    }
+
+    /**
      * Merge two nodes into the left node
+     *
      * @param left Node
      * @param right Node
      * @return center/middle ID
@@ -297,8 +286,8 @@ public class BTreeClass implements BTree {
         int plus = left.countKeys();
         int middle = plus;
 
-        // Shift the left content + size of right, if right smaller than left
-        if (right.contents[0].compareTo(left.contents[left.countKeys() - 1]) < 0) {
+        // Shift the left content + size of right, if right values are smaller than left
+        if (right.contents[0] != null && right.contents[0].compareTo(left.contents[left.countKeys() - 1]) < 0) {
             int rplus = right.countKeys();
             middle = rplus;
             plus = 0;
@@ -315,8 +304,8 @@ public class BTreeClass implements BTree {
                 left.subTrees[i + plus] = right.subTrees[i];
             }
         }
-        if (right.hasSubtrees()) {
-            left.subTrees[right.countKeys() + plus + 1] = right.subTrees[right.countKeys()];
+        if (right.hasSubtrees()) { // Don't forget the last subtree on the right
+            left.subTrees[right.countKeys() + plus] = right.subTrees[right.countKeys()];
         }
 
         return middle;
@@ -359,7 +348,7 @@ public class BTreeClass implements BTree {
         if (!isEmpty()) {
             return size(root);
         } else {
-            throw new GDIException("Tree is emtpy");
+            return 0;
         }
     }
 

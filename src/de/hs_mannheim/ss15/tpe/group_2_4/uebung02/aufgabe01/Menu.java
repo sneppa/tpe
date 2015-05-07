@@ -29,6 +29,7 @@ public class Menu {
         println("5: Höhe des Baums");
         println("6: Größter Eintrag des Baums");
         println("7: Kleinster Eintrag des Baums");
+        println("12: Zahl löschen");
         println("----------------- Ausgaben -----------------");
         println("8: inorder");
         println("9: postorder");
@@ -60,10 +61,12 @@ public class Menu {
                     println(btree.height());
                 break;
             case 6:
-                    println(btree.getMax());
+                    Comparable max = btree.getMax();
+                    println(max == null ? "Kein Eintrag vorhanden" : max);
                 break;
             case 7:
-                    println(btree.getMin());
+                    Comparable min = btree.getMin();
+                    println(min == null ? "Kein Eintrag vorhanden" : min);
                 break;
             case 8:
                     btree.printInorder();
@@ -76,6 +79,11 @@ public class Menu {
                 break;
             case 11:
                     btree.printLevelorder();
+                break;
+            case 12:
+                    print("Zahl eingeben: ");
+                    number = readInt();
+                    btree.delete(number);
                 break;
             default:
                 break;
