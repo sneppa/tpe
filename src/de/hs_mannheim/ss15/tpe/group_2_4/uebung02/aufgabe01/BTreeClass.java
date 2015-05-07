@@ -156,7 +156,7 @@ public class BTreeClass implements BTree {
             BTreeNode left = node.getSubtree(cIndex);
             BTreeNode right = node.getSubtree(cIndex + 1);
 //            println(left.countKeys());
-            if (left.countKeys() > order) //
+            if (left.countKeys() > order) // Use the next smaller Number from the left tree
             {
                 BTreeNode prev = left;
                 BTreeNode delete = left;
@@ -170,7 +170,7 @@ public class BTreeClass implements BTree {
                 Comparable newKey = prev.contents[prev.countKeys() - 1]; // Set found number as new key
                 node.contents[cIndex] = newKey;
                 delete(delete, newKey);
-            } else if (right.countKeys() > order) {
+            } else if (right.countKeys() > order) { // use the next bigger number from the right tree
                 BTreeNode next = right;
                 BTreeNode delete = right;
 
@@ -183,7 +183,7 @@ public class BTreeClass implements BTree {
                 Comparable newKey = next.contents[0]; // Set found number as new key
                 node.contents[cIndex] = newKey;
                 delete(delete, newKey);
-            } else {
+            } else { // left and right nodes are to small to get key, merge them
                 mergeNodes(left, right);
 //                left.contents[mIndex] = node.contents[cIndex];
 //                println(cIndex);
@@ -196,10 +196,11 @@ public class BTreeClass implements BTree {
                 node.contents[node.countKeys() - 1] = null;
                 node.subTrees[node.countKeys() + 1] = null;
             }
-        } else {
+        } else { // Key not found in this node
 //            println("No");
             int cIndex = 0;
 
+            // get index of Subtree which contains the key
             while (node.contents[cIndex] != null && node.contents[cIndex].compareTo(key) < 0) {
                 cIndex++;
             }
@@ -217,11 +218,12 @@ public class BTreeClass implements BTree {
                     right = node.subTrees[cIndex + 1];
                 }
 
-                if (left != null && left.countKeys() > order) {
-                    println("in left");
+                if (left != null && left.countKeys() > order) { // set the cIndex to the next smaller number from left subtree
+//                    println("in left");
                     left.contents[left.countKeys()] = node.contents[cIndex - 1];
 //                    println("countKeys "+node.countKeys());
 
+                    // shift to the left
                     for (int i = cIndex; i < node.countKeys(); i++) {
                         node.contents[i - 1] = node.contents[i];
                         node.subTrees[i - 1] = node.subTrees[i];
@@ -229,20 +231,21 @@ public class BTreeClass implements BTree {
                     node.contents[node.countKeys() - 1] = null;
                     node.subTrees[node.countKeys() + 1] = null;
 
-                } else if (right != null && right.countKeys() > order) {
-                    println("in right");
+                } else if (right != null && right.countKeys() > order) { // set the cIndex to the next bigger number from left subtree
+//                    println("in right");
                     right.shiftContents(0);
                     right.shiftTrees(0);
                     right.contents[0] = node.contents[cIndex];
 
+                    // shift to the right
                     for (int i = cIndex; i < node.countKeys(); i++) {
                         node.contents[i] = node.contents[i + 1];
                         node.subTrees[i] = node.subTrees[i + 1];
                     }
                     node.contents[node.countKeys()] = null;
                     node.subTrees[node.countKeys() + 1] = null;
-                } else if (left != null) {
-                    println("merged left");
+                } else if (left != null) { // Merge in the right tree
+//                    println("merged left");
                     int middle = mergeNodes(subtree, left);
                     subtree.shiftContents(middle);
                     subtree.shiftTrees(middle);
@@ -250,6 +253,7 @@ public class BTreeClass implements BTree {
 
 //                    println("mitte: " + middle);
 //                    println("cIndex: " + cIndex);
+                    // shift to the left
                     for (int i = cIndex; i < node.countKeys(); i++) {
                         node.contents[i - 1] = node.contents[i];
                         node.subTrees[i - 1] = node.subTrees[i];
@@ -257,8 +261,8 @@ public class BTreeClass implements BTree {
                     node.contents[node.countKeys() - 1] = null;
                     node.subTrees[node.countKeys()] = null;
 
-                } else if (right != null) {
-                    println("merged right");
+                } else if (right != null) { // merge in the left tree
+//                    println("merged right");
                     int middle = mergeNodes(subtree, right);
 //                    println("mitte: " + middle);
 //                    printHierarchy();
@@ -267,6 +271,7 @@ public class BTreeClass implements BTree {
                     subtree.contents[middle] = node.contents[cIndex];
 //                    printHierarchy();
 
+                    // shift to the right
                     for (int i = cIndex + 1; i < node.countKeys(); i++) {
                         node.contents[i - 1] = node.contents[i];
                         node.subTrees[i] = node.subTrees[i + 1];
@@ -279,15 +284,20 @@ public class BTreeClass implements BTree {
             }
 
             delete(subtree, key);
-
-//            if (node.getSubtree(i))
         }
     }
 
+    /**
+     * Merge two nodes into the left node
+     * @param left Node
+     * @param right Node
+     * @return center/middle ID
+     */
     public int mergeNodes(BTreeNode left, BTreeNode right) {
         int plus = left.countKeys();
         int middle = plus;
 
+        // Shift the left content + size of right, if right smaller than left
         if (right.contents[0].compareTo(left.contents[left.countKeys() - 1]) < 0) {
             int rplus = right.countKeys();
             middle = rplus;
@@ -298,6 +308,7 @@ public class BTreeClass implements BTree {
             }
         }
 
+        // Insert right contents to left node
         for (int i = 0; i < right.countKeys(); i++) {
             left.contents[i + plus] = right.contents[i];
             if (right.hasSubtrees()) {
