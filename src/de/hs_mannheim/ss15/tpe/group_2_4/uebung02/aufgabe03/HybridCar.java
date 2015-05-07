@@ -5,7 +5,7 @@ public class HybridCar extends Car implements Gasoline, Electric{
 	int emissionTier;
 	int voltage;
 	
-	HybridCar(int emissionTier, int voltage, String brand, int constructionYear, int price) {
+	public HybridCar(int emissionTier, int voltage, String brand, int constructionYear, int price) {
 		super(brand, constructionYear, price);
 		this.emissionTier = emissionTier;
 		this.voltage = voltage;

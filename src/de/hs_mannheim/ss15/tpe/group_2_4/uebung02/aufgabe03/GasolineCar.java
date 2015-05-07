@@ -4,7 +4,7 @@ public class GasolineCar extends Car implements Gasoline{
 
 	int emissionTier;
 	
-	GasolineCar(int emissionTier, String brand, int constructionYear, int price) {
+	public GasolineCar(int emissionTier, String brand, int constructionYear, int price) {
 		super(brand, constructionYear, price);
 		this.emissionTier = emissionTier;
 	}

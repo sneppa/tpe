@@ -4,7 +4,7 @@ public class ElectricCar extends Car implements Electric {
 
 	int voltage;
 	
-	ElectricCar(int voltage, String brand, int constructionYear, int price) {
+	public ElectricCar(int voltage, String brand, int constructionYear, int price) {
 		super(brand, constructionYear, price);
 		this.voltage = voltage;
 	}

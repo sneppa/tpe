@@ -1,8 +1,6 @@
 package de.hs_mannheim.ss15.tpe.group_2_4.uebung02;
 
-import de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02.CaesarCrypter;
-import de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02.Crypter;
-import de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02.ReverseCrypter;
+import de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
