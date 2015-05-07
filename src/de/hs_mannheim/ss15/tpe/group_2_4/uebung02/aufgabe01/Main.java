@@ -4,7 +4,7 @@ import static gdi.MakeItSimple.*;
 public class Main {
 
 	public static void main(String[] args) {
-            BTreeClass btree = new BTreeClass(2);
+            BTreeClass btree = new BTreeClass(1);
             
 //            btree.insert("integers.txt");
             

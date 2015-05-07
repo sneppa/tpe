@@ -136,7 +136,7 @@ public class BTreeClass implements BTree {
     }
 
     private void delete(BTreeNode node, Comparable key) {
-        if (!node.hasSubtrees()) { // Is a leave, delete key from Leave, if it exists.
+        if (!node.hasSubtrees()) { // Is a leaf, delete key from Leaf, if it exists.
 //            println("Leaf");
             boolean found = false;
             for (int i = 0; i <= nodeSize; i++) {

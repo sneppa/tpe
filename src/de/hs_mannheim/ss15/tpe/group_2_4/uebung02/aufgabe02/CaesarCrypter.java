@@ -6,7 +6,7 @@ public class CaesarCrypter implements Crypter{
 	private int key;
 
 	public CaesarCrypter(int key) {
-		this.key = key%26; //Key could be larger, but it is not necessary to make it large
+		this.key = key%26; //Key could be larger, but it is not necessary to make it large.
 	}
 
 	public void setKey(int key) { this.key = key%26; }
