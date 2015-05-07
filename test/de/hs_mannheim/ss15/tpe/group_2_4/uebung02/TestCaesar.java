@@ -1,4 +1,6 @@
-package de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02;
+package de.hs_mannheim.ss15.tpe.group_2_4.uebung02;
+
+import de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02.*;
 
 
 public class TestCaesar {
