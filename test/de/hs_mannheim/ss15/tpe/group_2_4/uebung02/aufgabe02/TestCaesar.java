@@ -1,7 +1,7 @@
 package de.hs_mannheim.ss15.tpe.group_2_4.uebung02.aufgabe02;
 
 
-public class Test {
+public class TestCaesar {
 
 	public static void main(String[] args) {
 		Crypter caesar = new CaesarCrypter(3);
