@@ -1,5 +1,5 @@
 
-package de.hs_mannheim.ss15.tpe.group_2_4.uebung03.aufgabe03;
+package de.hs_mannheim.ss15.tpe.group_2_4.uebung03.aufgabe02;
 import java.io.*;
 
 /**
@@ -9,6 +9,12 @@ import java.io.*;
 public class CaesarReader extends FilterReader {
 
     private int key;
+     
+    public CaesarReader(Reader in, int key) {
+        super(in);
+        this.in = in;
+        this.key = key;
+    }
      
     protected CaesarReader(Reader in) {
         super(in);

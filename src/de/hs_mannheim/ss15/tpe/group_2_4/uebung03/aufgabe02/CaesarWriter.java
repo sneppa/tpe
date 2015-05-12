@@ -1,4 +1,4 @@
-package de.hs_mannheim.ss15.tpe.group_2_4.uebung03.aufgabe03;
+package de.hs_mannheim.ss15.tpe.group_2_4.uebung03.aufgabe02;
 import java.io.*;
 /**
  *
@@ -8,9 +8,12 @@ public class CaesarWriter extends FilterWriter {
 
     private int key;
     
-    /**
-     *
-     */
+    public CaesarWriter(Writer out, int key) {
+        super(out);
+        this.out = out;
+        this.key = key;
+    }
+    
     protected CaesarWriter(Writer out) {
         super(out);
         this.out = out;
