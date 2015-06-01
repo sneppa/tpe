@@ -18,6 +18,8 @@ public class BTreeClass implements BTree{
 			root.insertValue(integer);
 			return true;
 		}
+		if(contains(integer))
+			return false;
 		return insert(integer, root);
 	}
 	
@@ -27,13 +29,13 @@ public class BTreeClass implements BTree{
 		}
 		else { //Otherwise look into which subtree to go now
 			int index = node.size;
-			boolean found = false;
+			boolean found = false; //Break condition for while-loop
 			while(index >= 0 && !found) {
-				while(index > 0 && node.getValue(index) == null && !found)
+				while(index > 0 && node.getValue(index) == null && !found) //decrease index until you find the first integers
 					index--;
-				if(index == 0) {
-					if(node.getValue(index) > integer) {
-						insert(integer, node.getSubtree(index));
+				if(index == 0) { //Special case at index 0
+					if(node.getValue(index) > integer) { //Decide whether to go into tree inside index 0 or 1
+						insert(integer, node.getSubtree(index)); 
 						found = true;
 					}
 					else {
@@ -41,7 +43,7 @@ public class BTreeClass implements BTree{
 						found = true;
 					}
 				}
-				else {
+				else { //Further decrease if integer not at the right spot
 					if(node.getValue(index) > integer)
 						index--;
 					else {
@@ -51,16 +53,16 @@ public class BTreeClass implements BTree{
 				}
 			}
 		}
-		if(node.full())
+		if(node.full()) //splitCheck whole tree if node is full after insertion
 			return splitCheck(root);
 		return true;
 	}
 	
 	private boolean splitCheck(BTreeNode node) {
-		if(node == root && node.full()) {
+		if(node == root && node.full()) { //Special case: root
 			BTreeNode left = new BTreeNode(nodeSize);
 			BTreeNode right = new BTreeNode(nodeSize);
-			for(int i = 0; i < nodeSize+1; i++) {
+			for(int i = 0; i < nodeSize+1; i++) { //Creates two new nodes which will contain everything from the former root except middle value
 				if(i < (nodeSize)/2) {
 					left.insertValue(node.getValue(i));
 					left.insertSubtree(node.getSubtree(i));
@@ -70,44 +72,46 @@ public class BTreeClass implements BTree{
 					right.insertSubtree(node.getSubtree(i));
 				}
 			}
+			//Don't forget the extra subtrees!
 			left.insertSubtree(node.getSubtree((nodeSize+1)/2));
 			right.insertSubtree(node.getSubtree(nodeSize+1));
 			Integer middle = node.getValue((nodeSize+1)/2);
-			node.clear();
+			node.clear(); //root stays the same object
 			node.insertValue(middle);
 			node.setSubtree(0, left);
 			node.setSubtree(1, right);
-			return splitCheck(root);
+			return splitCheck(root); //Continue check from scratch
 		}
-		for(int index = 0; index < node.size+1; index++) {
+		for(int index = 0; index < node.size+1; index++) { //Go through every subtree from the POV of the parent, so we keep the reference to it
 			BTreeNode subtree = node.getSubtree(index);
 			if(subtree != null && subtree.full()) {
-				BTreeNode add = new BTreeNode(nodeSize);
+				BTreeNode add = new BTreeNode(nodeSize); //One additional tree, former subtree is the "left" tree, add is the "right" tree
 				node.shiftContents(index); //Shift to make space for pulled up value
 				node.shiftTrees(index);
 				Integer middle = subtree.getValue((subtree.size)/2);
 				subtree.setValue((subtree.size)/2, null);
 				int i = ((node.size)/2);
-				while(i <= subtree.size){
+				while(i <= subtree.size){ //Carry half of the values from subtree to add
 					add.insertValue(subtree.getValue(i));
 					add.insertSubtree(subtree.getSubtree(i+1));
 					subtree.setSubtree(i+1, null);
 					subtree.setValue(i, null);
 					i++;
 				}
+				//Again, think about the last subtree to be carried over
 				add.insertSubtree(subtree.getSubtree(i+2));
 				subtree.setSubtree(i+2, null);
-				node.setValue(index,middle);
+				node.setValue(index,middle); //Pull up new middle value and set the subtrees
 				node.setSubtree(index, subtree);
 				node.setSubtree(index+1, add);
-				return splitCheck(root);
+				return splitCheck(root); //Again, check from scratch
 			}
 			else if(subtree != null && subtree.hasSubtrees()) {
 				
-				splitCheck(subtree);
+				splitCheck(subtree); //Check deeper
 			}
 		}
-		return true;
+		return true; //Finish
 	}
 
 	@Override
@@ -133,21 +137,25 @@ public class BTreeClass implements BTree{
 			return contains(integer, root);
 	}
 	
-//	private boolean contains(Integer integer, BTreeNode node) {
-//		int i = 0;
-//		while(i >= node.getValue(i)) {
-//			if(node.getValue(i) == integer)
-//				return true;
-//			i++;
-//			if(node.getValue(i) == null) {
-//				if(node.hasSubtrees())
-//					return contains(integer, node.getSubtree(nodeSize));
-//				else
-//					return false;
-//			}
-//		}
-//		return contains(integer, node.getSubtree(i));
-//	}
+	private boolean contains(Integer integer, BTreeNode node) {
+		int i = 0;
+		//Go through all values in node, iterate if integer bigger than value
+		while(integer >= node.getValue(i)) {
+			if(node.getValue(i) == integer)
+				return true;
+			i++;
+			if(node.getValue(i) == null) { //If at end of contents and no subtree available -> failure
+				if(node.getSubtree(i) != null)
+					return contains(integer, node.getSubtree(i)); //Else check inside subtree
+				else
+					return false;
+			}
+		}
+		if(node.getSubtree(i) == null) //Same procedure as right above but in the case of a smaller integer
+			return false;
+		else
+			return contains(integer, node.getSubtree(i));
+	}
 
 	@Override
 	public int size() {
@@ -159,7 +167,7 @@ public class BTreeClass implements BTree{
 		if(isEmpty())
 			return 0;
 		else
-			return 1 + height(root);
+			return height(root);
 	}
 	
 	private int height(BTreeNode node) {
