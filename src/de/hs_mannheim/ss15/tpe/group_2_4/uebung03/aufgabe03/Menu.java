@@ -11,10 +11,12 @@ public class Menu {
     public static void main(String[] args) {
         print("Bitte Ordner angeben: ");
         String folder = readLine();
-        CaesarFileEncryptor caesar = new CaesarFileEncryptor();
         File file = new File(folder);
             
+        print("Bitte geben Sie den Schlüssel zur Verschlüsselung an: ");
         
+        int selection = readInt();
+        CaesarFileEncryptor caesar = new CaesarFileEncryptor(selection);
 
         while (true) {
             println("------------------- Menü -------------------");
@@ -22,7 +24,7 @@ public class Menu {
             println("2: dekodieren");
             println("--------------------------------------------");
 
-            int selection = readInt();
+            selection = readInt();
 
             switch (selection) {
                 case 1:
