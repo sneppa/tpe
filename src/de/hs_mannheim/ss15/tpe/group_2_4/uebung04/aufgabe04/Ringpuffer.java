@@ -4,7 +4,7 @@ import static gdi.MakeItSimple.*;
 
 public class Ringpuffer {
 	
-	Integer[] contents;
+	volatile Integer[] contents;
 	int  back = 0
 		,front = 0;
 	
@@ -39,6 +39,11 @@ public class Ringpuffer {
 		for(Thread thread : threads) {
 			thread.stop();
 		}
+		System.out.println("End.");
+		System.out.print("[");
+		for(Integer i : contents)
+			System.out.print(i + " ");
+		System.out.println("]");
 	}
 	
 	synchronized void put(Integer i) {
