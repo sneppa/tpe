@@ -5,10 +5,13 @@ public class Putter extends Thread{
 	int interval;
 	double randomness;
 	Ringpuffer parent;
+	int count;
+	
 	
 	Putter(Ringpuffer parent, int interval, double randomness) {
 		this.interval = interval;
 		this.parent = parent;
+		count = 0;
 		if(0 <= randomness && randomness <= 1)
 			this.randomness = randomness;
 	}
@@ -19,9 +22,7 @@ public class Putter extends Thread{
 		} catch(InterruptedException e) {
 			System.out.println("Interrupted.");
 		}
-		Integer i = (int)(20*Math.random());
-		parent.put(i);
-		System.out.println(getName() + " put " + i);
+		System.out.println(getName() + " put " + count++);
 		run();
 	}
 

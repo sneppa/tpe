@@ -12,7 +12,7 @@ public class Ringpuffer {
 		System.out.println("Bitte geben sie die Laufdauer in Minuten an: ");
 		int i = readInt();
 		readLine();
-		System.out.println("Bitte geben sie die Größe des Puffers an: ");
+		System.out.println("Bitte geben sie die Grï¿½ï¿½e des Puffers an: ");
 		int j = readInt();
 		new Ringpuffer(j, i);
 	}
@@ -26,10 +26,8 @@ public class Ringpuffer {
 		threads[1].start();
 		threads[2] = new Putter(this, 1500, 0.2);
 		threads[2].start();
-		threads[3] = new Getter(this, 1000, 0.7);
-		threads[3].start();
-		threads[4] = new Getter(this, 1500, 0.2);
-		threads[4].start();
+		
+		while(enter(i) == false);
 		
 		try{
 			Thread.sleep(time*60000);
